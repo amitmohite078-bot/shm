@@ -85,3 +85,20 @@ export interface PhysicsConfig {
   enableSoundSim: boolean;
   highContrastMono: boolean;
 }
+
+export interface NetworkStrengthInfo {
+  isOnline: boolean;
+  pingMs: number; // Real measured round-trip latency in ms
+  jitterMs: number; // Real measured jitter in ms
+  downlinkMbps: number; // Real network downlink in Mbps
+  downlinkMBps: number; // Real network throughput in MB/s
+  effectiveType: '4g' | '3g' | '2g' | 'slow-2g' | '5g' | 'broadband' | 'ethernet' | 'wifi' | 'unknown';
+  connectionType: string;
+  strengthPercentage: number; // 0% - 100%
+  signalBars: 0 | 1 | 2 | 3 | 4; // 0 to 4 bars
+  quality: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR' | 'OFFLINE';
+  packetLossPercent: number;
+  lastChecked: number;
+  isRealTelemetry: boolean;
+}
+

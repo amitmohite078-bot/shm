@@ -6,8 +6,13 @@ import {
   ProcessItem, 
   MetricHistoryPoint, 
   TopologyNode, 
-  PhysicsConfig 
+  PhysicsConfig,
+  NetworkStrengthInfo 
 } from '../types';
+import { 
+  measureRealNetworkPing, 
+  getRealNetworkSnapshot 
+} from '../utils/networkTelemetry';
 
 interface RealHardwareInfo {
   cores: number;
@@ -57,13 +62,15 @@ interface SystemContextType {
   resetTelemetry: () => void;
   mousePos: { x: number; y: number; normalizedX: number; normalizedY: number };
   
-  // Real Hardware Permission Management
+  // Real Hardware & Real Network Strength Telemetry
   hasTelemetryPermission: boolean | null;
   showPermissionModal: boolean;
   openPermissionModal: () => void;
   grantPermission: () => void;
   denyPermission: () => void;
   realHardware: RealHardwareInfo;
+  networkStrength: NetworkStrengthInfo;
+  triggerManualPingCheck: () => Promise<void>;
 }
 
 const initialDevices: DeviceNode[] = [
@@ -81,9 +88,9 @@ const initialDevices: DeviceNode[] = [
     networkIn: 840,
     networkOut: 620,
     uptime: '42d 08h 12m',
-    cores: navigator.hardwareConcurrency || 16,
+    cores: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 16 : 16,
     frequencyGhz: 4.8,
-    lastPingMs: 0.8
+    lastPingMs: 12.4
   },
   {
     id: 'NODE-QUANTUM-04',
@@ -187,7 +194,7 @@ const initialAlerts: AlertItem[] = [
     timestamp: '00:00:01.00',
     acknowledged: true,
     metric: 'PHYSICAL_CORES',
-    value: `${navigator.hardwareConcurrency || 8} CORES`
+    value: `${typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 8 : 8} CORES`
   }
 ];
 
@@ -218,7 +225,14 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [alerts, setAlerts] = useState<AlertItem[]>(initialAlerts);
   const [processes, setProcesses] = useState<ProcessItem[]>(initialProcesses);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState<boolean>(() => {
+    return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  });
+
+  // Real Network Strength Telemetry State
+  const [networkStrength, setNetworkStrength] = useState<NetworkStrengthInfo>(() => {
+    return getRealNetworkSnapshot();
+  });
 
   // Permission State (prompt first)
   const [hasTelemetryPermission, setHasTelemetryPermission] = useState<boolean | null>(() => {
@@ -231,20 +245,20 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
 
   const [realHardware, setRealHardware] = useState<RealHardwareInfo>(() => {
-    const cores = navigator.hardwareConcurrency || 8;
-    const memInfo = (performance as any).memory;
+    const cores = typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 8 : 8;
+    const memInfo = typeof performance !== 'undefined' ? (performance as any).memory : null;
     const usedMb = memInfo ? Math.round(memInfo.usedJSHeapSize / (1024 * 1024)) : 140;
     const limitMb = memInfo ? Math.round(memInfo.jsHeapSizeLimit / (1024 * 1024)) : 4096;
-    const conn = (navigator as any).connection;
+    const conn = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
 
     return {
       cores,
       memoryUsageMb: usedMb,
       memoryLimitMb: limitMb,
       memoryPercentage: Math.round((usedMb / limitMb) * 100),
-      downlinkMbps: conn?.downlink || 100,
-      rttMs: conn?.rtt || 10,
-      platform: navigator.platform || 'Host System',
+      downlinkMbps: conn?.downlink ? Number(conn.downlink) : 25,
+      rttMs: conn?.rtt ? Number(conn.rtt) : 15,
+      platform: typeof navigator !== 'undefined' ? navigator.platform || 'Host System' : 'Host System',
       isRealTelemetry: true
     };
   });
@@ -261,20 +275,26 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0, normalizedX: 0, normalizedY: 0 });
 
-  const [currentMetrics, setCurrentMetrics] = useState({
-    cpu: 28,
-    ram: 45,
-    disk: 52,
-    network: 840,
-    quantumDrift: 0.04,
-    thermalC: 44,
-    powerWatts: 680,
-    iops: 98000
+  const [currentMetrics, setCurrentMetrics] = useState(() => {
+    const initialNet = getRealNetworkSnapshot();
+    return {
+      cpu: 28,
+      ram: 45,
+      disk: 52,
+      network: initialNet.downlinkMBps > 0 ? initialNet.downlinkMBps : 12.5,
+      quantumDrift: 0.04,
+      thermalC: 44,
+      powerWatts: 680,
+      iops: 98000
+    };
   });
 
   const [metricHistory, setMetricHistory] = useState<MetricHistoryPoint[]>(() => {
     const history: MetricHistoryPoint[] = [];
     const now = Date.now();
+    const initNet = getRealNetworkSnapshot();
+    const baseNet = initNet.downlinkMBps > 0 ? initNet.downlinkMBps : 12.5;
+
     for (let i = 24; i >= 0; i--) {
       const time = new Date(now - i * 2000).toTimeString().split(' ')[0];
       history.push({
@@ -282,13 +302,58 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         cpu: 25 + Math.sin(i * 0.4) * 8,
         ram: 42 + Math.cos(i * 0.3) * 4,
         disk: 52,
-        network: 800 + Math.sin(i * 0.5) * 200,
+        network: Number(Math.max(1, baseNet + (Math.sin(i * 0.5) * 1.5)).toFixed(1)),
         quantumDrift: 0.03,
         thermalC: 42 + Math.sin(i * 0.2) * 3
       });
     }
     return history;
   });
+
+  // Track Real Browser Online / Offline Events
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      const snapshot = getRealNetworkSnapshot();
+      setNetworkStrength(snapshot);
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setNetworkStrength(prev => ({
+        ...prev,
+        isOnline: false,
+        pingMs: 0,
+        downlinkMbps: 0,
+        downlinkMBps: 0,
+        strengthPercentage: 0,
+        signalBars: 0,
+        quality: 'OFFLINE',
+        packetLossPercent: 100,
+        lastChecked: Date.now()
+      }));
+    };
+
+    const conn = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+    const handleConnChange = () => {
+      const snapshot = getRealNetworkSnapshot();
+      setNetworkStrength(snapshot);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    if (conn) {
+      conn.addEventListener('change', handleConnChange);
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      if (conn) {
+        conn.removeEventListener('change', handleConnChange);
+      }
+    };
+  }, []);
 
   const grantPermission = useCallback(() => {
     setHasTelemetryPermission(true);
@@ -306,52 +371,83 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setShowPermissionModal(true);
   }, []);
 
-  // Real Hardware Telemetry Polling Loop
-  useEffect(() => {
+  // Manual Ping Trigger for Instant Diagnostic
+  const triggerManualPingCheck = useCallback(async () => {
     if (!isOnline) return;
+    const pingResult = await measureRealNetworkPing();
+    const snapshot = getRealNetworkSnapshot(pingResult.pingMs);
+    setNetworkStrength(snapshot);
+    setCurrentMetrics(prev => ({
+      ...prev,
+      network: snapshot.downlinkMBps
+    }));
+  }, [isOnline]);
+
+  // Real Hardware & Network Telemetry Polling Loop
+  useEffect(() => {
+    if (!isOnline) {
+      setNetworkStrength(prev => ({
+        ...prev,
+        isOnline: false,
+        pingMs: 0,
+        downlinkMbps: 0,
+        downlinkMBps: 0,
+        strengthPercentage: 0,
+        signalBars: 0,
+        quality: 'OFFLINE',
+        packetLossPercent: 100,
+        lastChecked: Date.now()
+      }));
+      return;
+    }
 
     const interval = setInterval(async () => {
+      // 1. Measure real network round-trip ping and snapshot real metrics
+      const pingResult = await measureRealNetworkPing();
+      const netSnapshot = getRealNetworkSnapshot(pingResult.pingMs);
+      setNetworkStrength(netSnapshot);
+
       let realCpu = currentMetrics.cpu;
       let realRam = currentMetrics.ram;
-      let realDownlink = 840;
-      let realPing = 0.8;
+      let realDownlinkMBps = netSnapshot.downlinkMBps;
 
-      if (hasTelemetryPermission) {
-        // Query real browser hardware APIs
-        const memInfo = (performance as any).memory;
-        if (memInfo) {
-          const usedMb = Math.round(memInfo.usedJSHeapSize / (1024 * 1024));
-          const limitMb = Math.round(memInfo.jsHeapSizeLimit / (1024 * 1024));
-          const pct = Math.max(10, Math.min(95, Math.round((usedMb / limitMb) * 100 * 3))); // scale for clarity
-          realRam = pct;
-        }
+      // 2. Query real hardware memory & CPU if available
+      const memInfo = typeof performance !== 'undefined' ? (performance as any).memory : null;
+      if (memInfo) {
+        const usedMb = Math.round(memInfo.usedJSHeapSize / (1024 * 1024));
+        const limitMb = Math.round(memInfo.jsHeapSizeLimit / (1024 * 1024));
+        const pct = Math.max(10, Math.min(95, Math.round((usedMb / limitMb) * 100 * 2.5)));
+        realRam = pct;
 
-        const conn = (navigator as any).connection;
-        if (conn) {
-          realDownlink = Math.round((conn.downlink || 10) * 80);
-          realPing = conn.rtt ? Number((conn.rtt / 10).toFixed(1)) : 1.2;
-        }
+        setRealHardware(prev => ({
+          ...prev,
+          memoryUsageMb: usedMb,
+          memoryLimitMb: limitMb,
+          memoryPercentage: pct,
+          downlinkMbps: netSnapshot.downlinkMbps,
+          rttMs: netSnapshot.pingMs
+        }));
+      }
 
-        // Try querying local Java backend if available
-        try {
-          const res = await fetch('http://localhost:8080/api/v1/system/real', { signal: AbortSignal.timeout(1000) });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.cpu !== undefined) realCpu = data.cpu;
-            if (data.ram !== undefined) realRam = data.ram;
-          }
-        } catch {
-          // Graceful fallback to real browser performance timing jitter
-          const perfEntries = performance.getEntriesByType('resource');
-          const recentCount = perfEntries.length;
-          realCpu = Math.max(12, Math.min(85, Math.round(20 + (recentCount % 30))));
+      // Try querying local backend if available
+      try {
+        const res = await fetch('http://localhost:8080/api/v1/system/real', { signal: AbortSignal.timeout(600) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.cpu !== undefined) realCpu = data.cpu;
+          if (data.ram !== undefined) realRam = data.ram;
         }
+      } catch {
+        // Fallback to real browser resource performance timings
+        const perfEntries = performance.getEntriesByType('resource');
+        const recentCount = perfEntries.length;
+        realCpu = Math.max(12, Math.min(85, Math.round(20 + (recentCount % 25))));
       }
 
       setCurrentMetrics(prev => {
-        const newCpu = hasTelemetryPermission ? realCpu : Math.max(15, Math.min(95, Math.round(prev.cpu + (Math.random() - 0.49) * 3)));
+        const newCpu = hasTelemetryPermission ? realCpu : Math.max(15, Math.min(95, Math.round(prev.cpu + (Math.random() - 0.49) * 2)));
         const newRam = hasTelemetryPermission ? realRam : prev.ram;
-        const newNet = hasTelemetryPermission ? realDownlink : prev.network;
+        const newNet = netSnapshot.isOnline ? (netSnapshot.downlinkMBps > 0 ? netSnapshot.downlinkMBps : 12.5) : 0;
 
         const newPoint: MetricHistoryPoint = {
           time: new Date().toTimeString().split(' ')[0],
@@ -373,18 +469,19 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         };
       });
 
-      // Update primary host node with real hardware
-      if (hasTelemetryPermission) {
-        setDevices(prev =>
-          prev.map((d, idx) => idx === 0 ? {
-            ...d,
-            cpu: realCpu,
-            ram: realRam,
-            cores: navigator.hardwareConcurrency || 16,
-            lastPingMs: realPing
-          } : d)
-        );
-      }
+      // Update primary host node with real hardware & network telemetry
+      setDevices(prev =>
+        prev.map((d, idx) => idx === 0 ? {
+          ...d,
+          cpu: realCpu,
+          ram: realRam,
+          cores: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 16 : 16,
+          lastPingMs: netSnapshot.pingMs,
+          networkIn: netSnapshot.downlinkMBps,
+          networkOut: Number((netSnapshot.downlinkMBps * 0.75).toFixed(1)),
+          status: netSnapshot.isOnline ? (netSnapshot.quality === 'POOR' ? 'degraded' : 'online') : 'offline'
+        } : d)
+      );
     }, 2000);
 
     return () => clearInterval(interval);
@@ -398,7 +495,8 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         100 -
         (currentMetrics.cpu > 70 ? (currentMetrics.cpu - 70) * 1.2 : 0) -
         (currentMetrics.ram > 80 ? (currentMetrics.ram - 80) * 1.5 : 0) -
-        (!isOnline ? 50 : 0)
+        (!isOnline ? 50 : 0) -
+        (networkStrength.quality === 'POOR' ? 15 : networkStrength.quality === 'FAIR' ? 5 : 0)
       )
     )
   );
@@ -470,7 +568,16 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setCurrentMetrics(prev => ({ ...prev, ram: 92 }));
       triggerSimulatedAlert('warning');
     } else if (type === 'network_drop') {
-      setCurrentMetrics(prev => ({ ...prev, network: 120, iops: 12400 }));
+      setCurrentMetrics(prev => ({ ...prev, network: 0.2, iops: 12400 }));
+      setNetworkStrength(prev => ({
+        ...prev,
+        pingMs: 380,
+        jitterMs: 45,
+        strengthPercentage: 15,
+        signalBars: 1,
+        quality: 'POOR',
+        packetLossPercent: 42
+      }));
       triggerSimulatedAlert('critical');
     } else if (type === 'quantum_drift') {
       setCurrentMetrics(prev => ({ ...prev, quantumDrift: 0.45 }));
@@ -479,21 +586,43 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [triggerSimulatedAlert]);
 
   const resetTelemetry = useCallback(() => {
+    const liveNet = getRealNetworkSnapshot();
     setCurrentMetrics({
       cpu: 28,
       ram: 45,
       disk: 52,
-      network: 840,
+      network: liveNet.downlinkMBps > 0 ? liveNet.downlinkMBps : 12.5,
       quantumDrift: 0.04,
       thermalC: 44,
       powerWatts: 680,
       iops: 98000
     });
+    setNetworkStrength(liveNet);
     setAlerts(initialAlerts);
   }, []);
 
   const toggleOnline = useCallback(() => {
-    setIsOnline(prev => !prev);
+    setIsOnline(prev => {
+      const next = !prev;
+      if (!next) {
+        setNetworkStrength(curr => ({
+          ...curr,
+          isOnline: false,
+          pingMs: 0,
+          downlinkMbps: 0,
+          downlinkMBps: 0,
+          strengthPercentage: 0,
+          signalBars: 0,
+          quality: 'OFFLINE',
+          packetLossPercent: 100,
+          lastChecked: Date.now()
+        }));
+      } else {
+        const live = getRealNetworkSnapshot();
+        setNetworkStrength(live);
+      }
+      return next;
+    });
   }, []);
 
   return (
@@ -530,7 +659,9 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         openPermissionModal,
         grantPermission,
         denyPermission,
-        realHardware
+        realHardware,
+        networkStrength,
+        triggerManualPingCheck
       }}
     >
       {children}

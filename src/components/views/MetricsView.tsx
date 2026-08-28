@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const MetricsView: React.FC = () => {
-  const { metricHistory, currentMetrics } = useSystem();
+  const { metricHistory, currentMetrics, networkStrength } = useSystem();
   const [timeRange, setTimeRange] = useState<'1m' | '5m' | '15m' | '1h'>('5m');
 
   return (
@@ -88,7 +88,7 @@ export const MetricsView: React.FC = () => {
           </div>
         </AntigravityCard>
 
-        {/* Network Ingress */}
+        {/* Network Ingress & Real Telemetry */}
         <AntigravityCard floatDelay="fast" depthZ={14}>
           <MonochromeChart
             data={metricHistory}
@@ -97,9 +97,9 @@ export const MetricsView: React.FC = () => {
             unit="MB/s"
           />
           <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-center text-[10px] font-mono text-neutral-400">
-            <div>PACKETS: <span className="text-white">1.8M/s</span></div>
-            <div>DROPS: <span className="text-white">0.00%</span></div>
-            <div>THROUGHPUT: <span className="text-white font-bold">{currentMetrics.network} MB/s</span></div>
+            <div>PING (RTT): <span className="text-[#00E5FF] font-bold">{networkStrength.isOnline ? `${networkStrength.pingMs} ms` : 'OFFLINE'}</span></div>
+            <div>STRENGTH: <span className="text-white font-bold">{networkStrength.strengthPercentage}% ({networkStrength.quality})</span></div>
+            <div>THROUGHPUT: <span className="text-white font-bold">{networkStrength.isOnline ? networkStrength.downlinkMBps : 0} MB/s</span></div>
           </div>
         </AntigravityCard>
 

@@ -21,7 +21,8 @@ export const DashboardView: React.FC = () => {
     alerts, 
     setView, 
     setSelectedDevice,
-    devices
+    devices,
+    networkStrength
   } = useSystem();
 
   const unackAlerts = alerts.filter(a => !a.acknowledged);
@@ -216,37 +217,53 @@ export const DashboardView: React.FC = () => {
             </div>
           </AntigravityCard>
 
-          {/* Network */}
-          <AntigravityCard floatDelay="slow" depthZ={12} className="group">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_6px_#00E5FF]" />
-                  <span className="text-[9px] font-mono tracking-widest text-neutral-400 uppercase">
-                    NETWORK // INGRESS
-                  </span>
+            {/* Real Network Telemetry */}
+            <AntigravityCard floatDelay="slow" depthZ={12} className="group">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      networkStrength.isOnline 
+                        ? networkStrength.signalBars >= 3 ? 'bg-[#00E5FF] shadow-[0_0_6px_#00E5FF]' : 'bg-amber-400'
+                        : 'bg-rose-500'
+                    }`} />
+                    <span className="text-[9px] font-mono tracking-widest text-neutral-400 uppercase">
+                      NETWORK // LIVE INGRESS
+                    </span>
+                  </div>
+                  <div className="mt-0.5 flex items-baseline gap-1">
+                    <span className="text-3xl font-bold font-display text-white tracking-tight">
+                      {networkStrength.isOnline ? networkStrength.downlinkMBps : 0}
+                    </span>
+                    <span className="text-xs font-mono text-[#00E5FF]">MB/s</span>
+                    <span className="text-[10px] font-mono text-neutral-400 ml-1">
+                      ({networkStrength.isOnline ? networkStrength.downlinkMbps : 0} Mbps)
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-0.5 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold font-display text-white tracking-tight">
-                    {currentMetrics.network}
-                  </span>
-                  <span className="text-xs font-mono text-[#00E5FF]">MB/s</span>
+                <div className="p-1.5 rounded bg-neutral-900 border border-neutral-800 text-[#00E5FF] group-hover:border-[#00E5FF] transition-all">
+                  <Wifi className="w-4 h-4" />
                 </div>
               </div>
-              <div className="p-1.5 rounded bg-neutral-900 border border-neutral-800 text-[#00E5FF] group-hover:border-[#00E5FF] transition-all">
-                <Wifi className="w-4 h-4" />
+
+              <div className="mt-2">
+                <MonochromeChart data={metricHistory} dataKey="network" height={50} showLabels={false} unit="MB/s" />
               </div>
-            </div>
 
-            <div className="mt-2">
-              <MonochromeChart data={metricHistory} dataKey="network" height={50} showLabels={false} unit="MB/s" />
-            </div>
-
-            <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between text-[9px] font-mono text-neutral-400">
-              <span>PACKETS: 1.8M/s</span>
-              <span className="text-[#00E5FF] font-semibold">0.4 ms</span>
-            </div>
-          </AntigravityCard>
+              <div className="mt-2 pt-2 border-t border-neutral-800 flex items-center justify-between text-[9px] font-mono text-neutral-400">
+                <span className="flex items-center gap-1.5">
+                  <span className="text-neutral-300 font-semibold">{networkStrength.strengthPercentage}% SIGNAL</span>
+                  <span>· {networkStrength.effectiveType.toUpperCase()}</span>
+                </span>
+                <span className={`font-semibold ${
+                  !networkStrength.isOnline ? 'text-rose-400' :
+                  networkStrength.pingMs <= 30 ? 'text-[#00E5FF]' :
+                  networkStrength.pingMs <= 80 ? 'text-emerald-400' : 'text-amber-400'
+                }`}>
+                  {networkStrength.isOnline ? `${networkStrength.pingMs} ms (RTT)` : 'OFFLINE'}
+                </span>
+              </div>
+            </AntigravityCard>
 
         </div>
       </div>
