@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSystem } from '../../context/SystemContext';
+import { NexoraLogo } from '../ui/NexoraLogo';
 import { 
   Search, 
   WifiOff, 
@@ -42,24 +43,10 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-3">
           <div 
             onClick={() => setView('dashboard')}
-            className="flex items-center gap-2.5 cursor-pointer group"
+            className="cursor-pointer transition-transform hover:opacity-95"
+            title="Nexora Core Dashboard"
           >
-            <div className="relative w-8 h-8 rounded-lg bg-neutral-950 border border-[#00E5FF]/40 flex items-center justify-center group-hover:border-[#00E5FF] transition-all shadow-[0_0_10px_rgba(0,229,255,0.2)]">
-              <div className="w-2.5 h-2.5 bg-[#00E5FF] rounded-full shadow-[0_0_6px_#00E5FF]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-sm tracking-widest text-white">
-                  NEXORA
-                </span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#00E5FF]/15 text-[#00E5FF] border border-[#00E5FF]/30 font-semibold">
-                  2035
-                </span>
-              </div>
-              <p className="text-[9px] font-mono text-neutral-400 tracking-wider">
-                CORE TELEMETRY MATRIX
-              </p>
-            </div>
+            <NexoraLogo size="sm" showTagline={true} />
           </div>
         </div>
 
