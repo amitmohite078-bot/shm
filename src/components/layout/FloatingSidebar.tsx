@@ -9,7 +9,8 @@ import {
   Cpu, 
   AlertTriangle, 
   Settings,
-  LogOut
+  LogOut,
+  Code2
 } from 'lucide-react';
 
 interface NavItem {
@@ -32,6 +33,7 @@ export const FloatingSidebar: React.FC = () => {
     { id: 'metrics', label: 'DEEP METRICS', sublabel: 'Telemetry Stream', icon: Activity },
     { id: 'processes', label: 'PROCESSES', sublabel: 'Thread Matrix', icon: Cpu },
     { id: 'alerts', label: 'INCIDENTS', sublabel: 'Threat Hub', icon: AlertTriangle, badge: unackAlertsCount > 0 ? unackAlertsCount : undefined },
+    { id: 'tech-stack', label: 'TECH & JAVA', sublabel: 'Concepts & GoF', icon: Code2, badge: 'NEW' },
     { id: 'settings', label: 'GRAVITY & FX', sublabel: 'Physics Controls', icon: Settings },
   ];
 

@@ -67,8 +67,8 @@ export const AntigravityCard: React.FC<AntigravityCardProps> = ({
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{
-        transform: `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateZ(${isHovered ? depthZ * 1.5 : depthZ}px)`,
-        transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
+        transform: isHovered ? 'translateY(-2px)' : 'none',
+        transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease'
       }}
       className={`
         relative rounded-xl

@@ -13,6 +13,7 @@ import { TopologyView } from './components/views/TopologyView';
 import { MetricsView } from './components/views/MetricsView';
 import { ProcessesView } from './components/views/ProcessesView';
 import { AlertsView } from './components/views/AlertsView';
+import { TechStackJavaConceptsView } from './components/views/TechStackJavaConceptsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoginBootView } from './components/views/LoginBootView';
 
@@ -64,6 +65,7 @@ const MainLayout: React.FC = () => {
           {view === 'metrics' && <MetricsView />}
           {view === 'processes' && <ProcessesView />}
           {view === 'alerts' && <AlertsView />}
+          {view === 'tech-stack' && <TechStackJavaConceptsView />}
           {view === 'settings' && <SettingsView />}
         </div>
       </main>

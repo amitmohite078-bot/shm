@@ -382,6 +382,38 @@ export const DashboardView: React.FC = () => {
 
       </div>
 
+      {/* Tech Stack & Java Concepts Quick Link Banner */}
+      <AntigravityCard className="p-4 bg-black border-neutral-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-[#00E5FF]">
+              <Server className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold text-white tracking-wide">
+                  SYSTEM ARCHITECTURE // TECH STACK & JAVA CONCEPTS
+                </span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 font-bold">
+                  GoF PATTERNS & MULTITHREADING
+                </span>
+              </div>
+              <p className="text-[11px] font-mono text-neutral-400 mt-0.5">
+                Explore full breakdown of React + Three.js, Java Spring Boot backend, 11 GoF design patterns, concurrency models, and enterprise use cases.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setView('tech-stack')}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#00E5FF] text-black font-mono font-bold text-xs hover:bg-white transition-all shadow-[0_0_15px_rgba(0,229,255,0.3)] shrink-0"
+          >
+            <span>VIEW TECH ARCHITECTURE</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </button>
+        </div>
+      </AntigravityCard>
+
     </div>
   );
 };

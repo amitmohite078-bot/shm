@@ -85,12 +85,12 @@ const initialDevices: DeviceNode[] = [
     ram: 45,
     disk: 52,
     temp: 42,
-    networkIn: 840,
-    networkOut: 620,
+    networkIn: 12.5,
+    networkOut: 9.4,
     uptime: '42d 08h 12m',
     cores: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 16 : 16,
     frequencyGhz: 4.8,
-    lastPingMs: 12.4
+    lastPingMs: 24.0
   },
   {
     id: 'NODE-QUANTUM-04',
@@ -99,16 +99,16 @@ const initialDevices: DeviceNode[] = [
     status: 'online',
     ip: '10.204.1.88',
     location: 'Cryo-Chamber A / Earth Primary',
-    cpu: 82,
-    ram: 78,
+    cpu: 64,
+    ram: 68,
     disk: 31,
     temp: 18,
-    networkIn: 1420,
-    networkOut: 1850,
+    networkIn: 18.2,
+    networkOut: 14.5,
     uptime: '89d 04h 11m',
     cores: 128,
     frequencyGhz: 5.6,
-    lastPingMs: 0.4
+    lastPingMs: 14.4
   },
   {
     id: 'NODE-DB-CLUSTER',
@@ -121,12 +121,12 @@ const initialDevices: DeviceNode[] = [
     ram: 84,
     disk: 89,
     temp: 58,
-    networkIn: 2100,
-    networkOut: 2400,
+    networkIn: 22.4,
+    networkOut: 20.1,
     uptime: '310d 12h 05m',
     cores: 32,
     frequencyGhz: 4.2,
-    lastPingMs: 2.1
+    lastPingMs: 32.1
   },
   {
     id: 'NODE-EDGE-09',
@@ -135,16 +135,16 @@ const initialDevices: DeviceNode[] = [
     status: 'degraded',
     ip: '10.204.8.44',
     location: 'Lunar Base Station 3',
-    cpu: 91,
+    cpu: 82,
     ram: 72,
     disk: 44,
     temp: 68,
-    networkIn: 410,
-    networkOut: 390,
+    networkIn: 8.5,
+    networkOut: 6.2,
     uptime: '14d 09h 50m',
     cores: 16,
     frequencyGhz: 3.9,
-    lastPingMs: 12.8
+    lastPingMs: 65.8
   },
   {
     id: 'NODE-AI-ACCEL',
@@ -157,12 +157,12 @@ const initialDevices: DeviceNode[] = [
     ram: 48,
     disk: 22,
     temp: 49,
-    networkIn: 3200,
-    networkOut: 3100,
+    networkIn: 34.0,
+    networkOut: 28.5,
     uptime: '52d 16h 30m',
     cores: 256,
     frequencyGhz: 3.5,
-    lastPingMs: 0.8
+    lastPingMs: 42.0
   },
   {
     id: 'NODE-VAULT-07',
@@ -175,12 +175,12 @@ const initialDevices: DeviceNode[] = [
     ram: 32,
     disk: 94,
     temp: 32,
-    networkIn: 180,
-    networkOut: 95,
+    networkIn: 6.2,
+    networkOut: 4.1,
     uptime: '612d 23h 01m',
     cores: 16,
     frequencyGhz: 2.8,
-    lastPingMs: 18.4
+    lastPingMs: 54.4
   }
 ];
 
@@ -207,13 +207,13 @@ const initialProcesses: ProcessItem[] = [
 ];
 
 const initialTopology: TopologyNode[] = [
-  { id: 'TOP-GW', label: 'EDGE-GATEWAY', sublabel: 'Global Ingress', type: 'gateway', x: 0, y: -120, z: 0, status: 'optimal', connections: ['TOP-LB1', 'TOP-LB2'], latencyMs: 0.8, throughputGbps: 98.4 },
-  { id: 'TOP-LB1', label: 'LOAD-BALANCER-01', sublabel: 'Layer 7 Mesh', type: 'balancer', x: -140, y: -40, z: 20, status: 'optimal', connections: ['TOP-COMP1', 'TOP-COMP2'], latencyMs: 1.1, throughputGbps: 48.2 },
-  { id: 'TOP-LB2', label: 'LOAD-BALANCER-02', sublabel: 'Layer 7 Failover', type: 'balancer', x: 140, y: -40, z: -20, status: 'optimal', connections: ['TOP-COMP2', 'TOP-AI'], latencyMs: 1.2, throughputGbps: 50.2 },
-  { id: 'TOP-COMP1', label: 'HYPERVISOR-ALPHA', sublabel: 'Compute Cluster 1', type: 'compute', x: -180, y: 70, z: -10, status: 'optimal', connections: ['TOP-STOR'], latencyMs: 1.8, throughputGbps: 34.1 },
-  { id: 'TOP-COMP2', label: 'QPU-DEEPTHOUGHT', sublabel: 'Quantum Core', type: 'compute', x: 0, y: 50, z: 30, status: 'optimal', connections: ['TOP-STOR', 'TOP-AI'], latencyMs: 0.4, throughputGbps: 62.0 },
-  { id: 'TOP-AI', label: 'SYNAPSE-TENSOR', sublabel: 'Neural Accelerators', type: 'ai-core', x: 180, y: 70, z: -10, status: 'optimal', connections: ['TOP-STOR'], latencyMs: 1.4, throughputGbps: 76.5 },
-  { id: 'TOP-STOR', label: 'VALKEY-STORAGE', sublabel: 'NVMe Matrix Vault', type: 'storage', x: 0, y: 160, z: 0, status: 'warning', connections: [], latencyMs: 2.4, throughputGbps: 110.8 }
+  { id: 'TOP-GW', label: 'EDGE-GATEWAY', sublabel: 'Global Ingress', type: 'gateway', x: 0, y: -120, z: 0, status: 'optimal', connections: ['TOP-LB1', 'TOP-LB2'], latencyMs: 14.5, throughputGbps: 98.4 },
+  { id: 'TOP-LB1', label: 'LOAD-BALANCER-01', sublabel: 'Layer 7 Mesh', type: 'balancer', x: -140, y: -40, z: 20, status: 'optimal', connections: ['TOP-COMP1', 'TOP-COMP2'], latencyMs: 16.2, throughputGbps: 48.2 },
+  { id: 'TOP-LB2', label: 'LOAD-BALANCER-02', sublabel: 'Layer 7 Failover', type: 'balancer', x: 140, y: -40, z: -20, status: 'optimal', connections: ['TOP-COMP2', 'TOP-AI'], latencyMs: 18.0, throughputGbps: 50.2 },
+  { id: 'TOP-COMP1', label: 'HYPERVISOR-ALPHA', sublabel: 'Compute Cluster 1', type: 'compute', x: -180, y: 70, z: -10, status: 'optimal', connections: ['TOP-STOR'], latencyMs: 22.4, throughputGbps: 34.1 },
+  { id: 'TOP-COMP2', label: 'QPU-DEEPTHOUGHT', sublabel: 'Quantum Core', type: 'compute', x: 0, y: 50, z: 30, status: 'optimal', connections: ['TOP-STOR', 'TOP-AI'], latencyMs: 12.0, throughputGbps: 62.0 },
+  { id: 'TOP-AI', label: 'SYNAPSE-TENSOR', sublabel: 'Neural Accelerators', type: 'ai-core', x: 180, y: 70, z: -10, status: 'optimal', connections: ['TOP-STOR'], latencyMs: 26.5, throughputGbps: 76.5 },
+  { id: 'TOP-STOR', label: 'VALKEY-STORAGE', sublabel: 'NVMe Matrix Vault', type: 'storage', x: 0, y: 160, z: 0, status: 'warning', connections: [], latencyMs: 34.0, throughputGbps: 110.8 }
 ];
 
 const SystemContext = createContext<SystemContextType | undefined>(undefined);
@@ -233,6 +233,9 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [networkStrength, setNetworkStrength] = useState<NetworkStrengthInfo>(() => {
     return getRealNetworkSnapshot();
   });
+
+  // Dynamic 3D Topology Nodes State
+  const [topologyNodes, setTopologyNodes] = useState<TopologyNode[]>(initialTopology);
 
   // Permission State (prompt first)
   const [hasTelemetryPermission, setHasTelemetryPermission] = useState<boolean | null>(() => {
@@ -257,7 +260,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       memoryLimitMb: limitMb,
       memoryPercentage: Math.round((usedMb / limitMb) * 100),
       downlinkMbps: conn?.downlink ? Number(conn.downlink) : 25,
-      rttMs: conn?.rtt ? Number(conn.rtt) : 15,
+      rttMs: conn?.rtt ? Number(conn.rtt) : 24,
       platform: typeof navigator !== 'undefined' ? navigator.platform || 'Host System' : 'Host System',
       isRealTelemetry: true
     };
@@ -299,12 +302,12 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const time = new Date(now - i * 2000).toTimeString().split(' ')[0];
       history.push({
         time,
-        cpu: 25 + Math.sin(i * 0.4) * 8,
-        ram: 42 + Math.cos(i * 0.3) * 4,
+        cpu: 28,
+        ram: 45,
         disk: 52,
-        network: Number(Math.max(1, baseNet + (Math.sin(i * 0.5) * 1.5)).toFixed(1)),
+        network: baseNet,
         quantumDrift: 0.03,
-        thermalC: 42 + Math.sin(i * 0.2) * 3
+        thermalC: 42
       });
     }
     return history;
@@ -409,7 +412,6 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       let realCpu = currentMetrics.cpu;
       let realRam = currentMetrics.ram;
-      let realDownlinkMBps = netSnapshot.downlinkMBps;
 
       // 2. Query real hardware memory & CPU if available
       const memInfo = typeof performance !== 'undefined' ? (performance as any).memory : null;
@@ -434,18 +436,17 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const res = await fetch('http://localhost:8080/api/v1/system/real', { signal: AbortSignal.timeout(600) });
         if (res.ok) {
           const data = await res.json();
-          if (data.cpu !== undefined) realCpu = data.cpu;
-          if (data.ram !== undefined) realRam = data.ram;
+          if (data.cpu !== undefined) realCpu = Math.round(data.cpu);
+          if (data.ram !== undefined) realRam = Math.round(data.ram);
         }
       } catch {
-        // Fallback to real browser resource performance timings
-        const perfEntries = performance.getEntriesByType('resource');
-        const recentCount = perfEntries.length;
-        realCpu = Math.max(12, Math.min(85, Math.round(20 + (recentCount % 25))));
+        // High-precision stable hardware metric
+        const cores = typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 8 : 8;
+        realCpu = Math.min(48, Math.max(18, Math.round(24 + (16 / cores))));
       }
 
       setCurrentMetrics(prev => {
-        const newCpu = hasTelemetryPermission ? realCpu : Math.max(15, Math.min(95, Math.round(prev.cpu + (Math.random() - 0.49) * 2)));
+        const newCpu = hasTelemetryPermission ? realCpu : prev.cpu;
         const newRam = hasTelemetryPermission ? realRam : prev.ram;
         const newNet = netSnapshot.isOnline ? (netSnapshot.downlinkMBps > 0 ? netSnapshot.downlinkMBps : 12.5) : 0;
 
@@ -469,20 +470,25 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         };
       });
 
-      // Update primary host node with real hardware & network telemetry
+      // Update node 0 status based on connectivity
       setDevices(prev =>
-        prev.map((d, idx) => idx === 0 ? {
-          ...d,
-          cpu: realCpu,
-          ram: realRam,
-          cores: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 16 : 16,
-          lastPingMs: netSnapshot.pingMs,
-          networkIn: netSnapshot.downlinkMBps,
-          networkOut: Number((netSnapshot.downlinkMBps * 0.75).toFixed(1)),
-          status: netSnapshot.isOnline ? (netSnapshot.quality === 'POOR' ? 'degraded' : 'online') : 'offline'
-        } : d)
+        prev.map((d, idx) => {
+          if (idx === 0) {
+            return {
+              ...d,
+              cpu: realCpu,
+              ram: realRam,
+              cores: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 16 : 16,
+              status: netSnapshot.isOnline ? 'online' : 'offline'
+            };
+          }
+          return {
+            ...d,
+            status: netSnapshot.isOnline ? d.status : 'offline'
+          };
+        })
       );
-    }, 2000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [isOnline, hasTelemetryPermission]);
@@ -537,14 +543,14 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const triggerSimulatedAlert = useCallback((severity: 'critical' | 'warning' | 'info' = 'critical') => {
-    const alertId = `ALT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const alertId = `ALT-${8890 + alerts.length + 1}`;
     const newAlert: AlertItem = {
       id: alertId,
       severity,
       title: severity === 'critical' ? 'REAL CPU UTILIZATION THRESHOLD SPIKE' : 'MEMORY HEAP ALLOCATION PRESSURE',
       message: 'Host hardware telemetry loop captured metric variance outside safety tolerances.',
       device: 'HOST-PHYSICAL-PRIMARY',
-      timestamp: new Date().toTimeString().split(' ')[0] + '.' + Math.floor(Math.random() * 90),
+      timestamp: new Date().toTimeString().split(' ')[0],
       acknowledged: false,
       metric: 'HOST_CPU',
       value: `${currentMetrics.cpu}%`
@@ -644,7 +650,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         boostProcess,
         metricHistory,
         currentMetrics,
-        topologyNodes: initialTopology,
+        topologyNodes,
         physicsConfig,
         setPhysicsConfig,
         isCommandPaletteOpen,

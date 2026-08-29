@@ -5,6 +5,7 @@ export type ViewMode =
   | 'metrics' 
   | 'processes' 
   | 'alerts' 
+  | 'tech-stack'
   | 'settings' 
   | 'login';
 

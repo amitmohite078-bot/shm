@@ -90,29 +90,15 @@ html, body {
   transform-style: preserve-3d;
 }
 
-/* Spatial Floating Panels */
-.antigravity-float-slow {
-  animation: agFloat 8s ease-in-out infinite;
-}
-
-.antigravity-float-mid {
-  animation: agFloat 6s ease-in-out infinite 1s;
-}
-
+/* Solid Spatial Panels */
+.antigravity-float-slow,
+.antigravity-float-mid,
 .antigravity-float-fast {
-  animation: agFloat 4.5s ease-in-out infinite 2s;
+  /* Stationary solid positioning - no floating bobbing */
+  transform: none;
 }
 
-@keyframes agFloat {
-  0%, 100% {
-    transform: translateY(0px) translateZ(0px) rotateX(0deg);
-  }
-  50% {
-    transform: translateY(-8px) translateZ(12px) rotateX(0.5deg);
-  }
-}
-
-/* Floating Deep Black Blocks with High-Contrast Depth */
+/* Deep Black Blocks with High-Contrast Depth */
 .floating-black-block {
   background: linear-gradient(135deg, #0A0A0A 0%, #000000 100%);
   color: #FFFFFF;
@@ -121,14 +107,13 @@ html, body {
     0 15px 35px -10px rgba(0, 0, 0, 0.45),
     0 0 1px 1px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-style: preserve-3d;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .floating-black-block:hover {
   border-color: rgba(0, 229, 255, 0.5);
   box-shadow: 
-    0 25px 50px -15px rgba(0, 0, 0, 0.6),
+    0 20px 40px -15px rgba(0, 0, 0, 0.6),
     0 0 20px rgba(0, 229, 255, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }

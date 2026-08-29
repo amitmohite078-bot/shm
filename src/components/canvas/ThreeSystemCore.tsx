@@ -136,7 +136,7 @@ export const ThreeSystemCore: React.FC<ThreeSystemCoreProps> = ({
     coreGroup.add(ring2);
 
     // Electric Blue Satellite Beacon 2 (RAM)
-    const sat2Geo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+    const sat2Geo = new THREE.SphereGeometry(0.14, 16, 16);
     const sat2Mat = new THREE.MeshBasicMaterial({ color: 0x0070f3 });
     const sat2 = new THREE.Mesh(sat2Geo, sat2Mat);
     coreGroup.add(sat2);

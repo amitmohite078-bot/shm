@@ -62,11 +62,9 @@ export const LoginBootView: React.FC = () => {
           
           {/* Header with Nexora Brand Lockup */}
           <div className="text-center space-y-3 mb-8 flex flex-col items-center">
-            <div className="relative mb-2">
-              <NexoraIcon size={80} animated={true} />
+            <div className="mb-2">
+              <NexoraLogo size="xl" showTagline={true} />
             </div>
-            
-            <NexoraLogo size="lg" showTagline={true} />
             
             <p className="text-xs font-mono text-neutral-400 max-w-xs mx-auto pt-1">
               High-Precision Java Telemetry & Autonomous Core Console

@@ -38,6 +38,7 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
     ];
     setLogs(initialLogs);
 
+    let msgIdx = 0;
     const interval = setInterval(() => {
       const msgs = [
         `[${new Date().toISOString().slice(11, 19)}] [STREAM] Telemetry frame acknowledged by edge relay.`,
@@ -45,9 +46,10 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ device, on
         `[${new Date().toISOString().slice(11, 19)}] [SECURITY] eBPF filter rule 402 matched and authorized.`,
         `[${new Date().toISOString().slice(11, 19)}] [THERMAL] Fan speed adjusted: 4200 RPM -> optimal gradient.`
       ];
-      const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
-      setLogs(prev => [...prev.slice(-14), randomMsg]);
-    }, 2800);
+      const nextMsg = msgs[msgIdx % msgs.length];
+      msgIdx++;
+      setLogs(prev => [...prev.slice(-14), nextMsg]);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [device]);

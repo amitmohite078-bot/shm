@@ -48,6 +48,7 @@ export const CommandPalette: React.FC = () => {
     { id: 'view_metrics', category: 'Navigation', title: 'Open Deep Metrics', sub: 'Quantum drift & thermal telemetry', icon: Activity, action: () => setView('metrics') },
     { id: 'view_proc', category: 'Navigation', title: 'Open Process Inspector', sub: 'Kernel thread tree & PID killer', icon: Cpu, action: () => setView('processes') },
     { id: 'view_alerts', category: 'Navigation', title: 'Open Alert Hub', sub: 'Active incidents and logs', icon: AlertTriangle, action: () => setView('alerts') },
+    { id: 'view_tech', category: 'Navigation', title: 'View Tech Stack & Java Concepts', sub: 'GoF patterns, Multithreading, JVM, & Use Cases', icon: Sparkles, action: () => setView('tech-stack') },
     { id: 'view_settings', category: 'Navigation', title: 'Configure Antigravity Physics', sub: 'Gravity scale, particles, parallax', icon: Sliders, action: () => setView('settings') },
     
     // Anomaly / Stress tests
